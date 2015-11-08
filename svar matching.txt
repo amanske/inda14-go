@@ -1,0 +1,37 @@
+* Vad händer om man tar bort go-kommandot från Seek-anropet i main-funktionen?
+
+Hypotes: Ordningen kommer att bli bestämd. Anna kommer skicka till Bob, Cody till
+Dave, och Eva till ingen. Detta eftersom att vektorn "people" då kommer att iterera
+från första till sista elementet och Seek sättas igång vartefter. Om vi har 
+"go" kvar beror ordningen på hur snabbt de olika rutinerna hinner köra klart.
+
+Svar: Jag antar att min hypotes stämmer. Med go-kommandot inkluderat får jag även
+A -> B, C -> D och E -> men jag antar att detta är för att rutinerna är hyfsat lika
+i körtid.
+
+* Vad händer om man byter deklarationen wg := new(sync.WaitGroup) mot 
+  var wg sync.WaitGroup och parametern wg *sync.WaitGroup mot wg sync.WaitGroup?
+  
+Hypotes: Inget. Istället för att skapa och anropa en pekare så skapar och anropar vi
+en variabel. Jag tror ej att det bör ändra något.
+
+Svar: Vi får en deadlock. Jag tror att detta kan bero på att wg.Done() i Seek-anropet
+blir ett värde och inte en referens (eftersom att vi hanterar en variabel). wg.Wait() 
+(i main) kommer alltså att vänta på att wg blir färdig, men eftersom att wg är 
+en lokal kopia i Seek kommer den aldrig att bli det.
+
+* Vad händer om man tar bort bufferten på kanalen match?
+
+Hypotes: Det kommer att bli ett deadlock när Eva ska skicka sitt meddelande eftersom att 
+det ej finns någon som tar emot det. Detta leder till att det sista wg.Done() ej kommer 
+att anropas = programmet stannar vid wg.Wait().
+
+Svar: Hypotesen ser ut att stämma.
+
+* Vad händer om man tar bort default-fallet från case-satsen i main-funktionen?
+
+Hypotes: Ingenting, eftersom att default inte gör/anropar någonting.
+
+Svar: Hypotesen ser ut att stämma. Kom dock på att om antalet personer hade varit jämnt
+så skulle default behövas. Annars skulle programmet ej kunna avslutas eftersom att
+det skulle vänta på ett överblivet meddelande. 
